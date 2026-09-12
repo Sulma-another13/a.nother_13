@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30초 관계 구조 진단 | 어나더</title>
+<meta name="description" content="10문항으로 두 사람의 애착 유형과 추격-회피 사이클 위치를 진단합니다. 썸·연애·재회 구조 분석.">
+
+<!-- ===================================================================
+     [수정 안내]
+       KAKAO_LINK  - 카카오톡 오픈채팅/채널 링크로 교체
+       DETAIL_LINK - 상담 상세페이지 링크로 교체
+     Ctrl+F 로 검색하면 바로 찾습니다. 각각 2곳씩 있습니다.
+=================================================================== -->
+
+<meta property="og:title" content="30초 관계 구조 진단">
+<meta property="og:description" content="두 사람의 애착 유형과 지금 서 있는 위치를 진단합니다.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+
+<style>
+:root{
+  --ink:#151A2E; --ink-2:#1D2440; --line-d:#333B5C;
+  --paper:#F1F0ED; --paper-2:#FAFAF8; --line:#D5D2CC;
+  --text:#1E2233; --muted:#696E80; --muted-l:#9AA0B0;
+  --rose:#A83E56; --rose-deep:#8C2F45; --rose-tint:#EFE2E4;
+  --serif:'Gowun Batang',serif;
+  --sans:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:var(--sans);background:var(--ink);color:#E8EAF0;
+  line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;
+  min-height:100vh;
+}
+.shell{max-width:600px;margin:0 auto;padding:0 22px}
+h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.45;letter-spacing:-.02em}
+.kw{word-break:keep-all}
+:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+
+/* 인트로 */
+#intro{padding:76px 0 60px}
+.mark{font-family:var(--serif);font-size:13px;letter-spacing:.2em;color:var(--muted-l);margin-bottom:34px}
+#intro h1{font-size:33px;color:#fff;margin-bottom:20px}
+#intro .sub{color:#A8AFC2;font-size:16px;margin-bottom:30px}
+.pre{border-top:1px solid var(--line-d);border-bottom:1px solid var(--line-d);padding:22px 0;margin-bottom:32px}
+.pre li{list-style:none;font-size:15.5px;color:#C2C8D8;padding-left:16px;position:relative;margin-bottom:9px}
+.pre li:last-child{margin-bottom:0}
+.pre li::before{content:"";position:absolute;left:0;top:13px;width:7px;height:1px;background:var(--rose)}
+.meta{font-size:13.5px;color:#7C839A;margin-top:20px}
+
+.btn{
+  display:block;width:100%;background:var(--rose);color:#fff;border:0;
+  padding:17px;border-radius:3px;font-family:var(--sans);font-size:16.5px;
+  font-weight:600;cursor:pointer;transition:background .18s;text-align:center;
+  text-decoration:none;letter-spacing:-.01em;
+}
+.btn:hover,.btn:focus-visible{background:var(--rose-deep)}
+.btn-line{
+  display:block;width:100%;background:transparent;color:#E8EAF0;
+  border:1px solid var(--line-d);padding:16px;border-radius:3px;
+  font-family:var(--sans);font-size:15.5px;cursor:pointer;text-align:center;
+  text-decoration:none;margin-top:10px;transition:border-color .18s;
+}
+.btn-line:hover,.btn-line:focus-visible{border-color:#7C839A}
+
+/* 문항 */
+#quiz{display:none;padding:34px 0 60px;min-height:100vh}
+.bar{height:2px;background:var(--line-d);margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--rose);width:0;transition:width .3s ease}
+.count{font-size:13px;color:#7C839A;margin-bottom:38px;display:flex;justify-content:space-between}
+.axis{font-family:var(--serif);font-size:13px;color:var(--muted-l);letter-spacing:.08em}
+#qtext{font-family:var(--serif);font-size:23px;color:#fff;margin-bottom:30px;line-height:1.5}
+.opts{display:grid;gap:9px}
+.opt{
+  background:var(--ink-2);border:1px solid var(--line-d);color:#DDE1EB;
+  padding:17px 18px;border-radius:3px;font-family:var(--sans);font-size:15.5px;
+  text-align:left;cursor:pointer;line-height:1.55;transition:border-color .15s,background .15s;
+  word-break:keep-all;
+}
+.opt:hover,.opt:focus-visible{border-color:var(--rose);background:#232B49}
+.back{
+  background:none;border:0;color:#6E7793;font-size:14px;cursor:pointer;
+  margin-top:26px;font-family:var(--sans);padding:6px 0;
+}
+.back:hover{color:#A8AFC2}
+
+/* 결과 */
+#result{display:none;background:var(--paper);color:var(--text);min-height:100vh;padding:60px 0 70px}
+#result .shell{max-width:600px}
+.rhead{font-family:var(--serif);font-size:13px;letter-spacing:.18em;color:var(--muted);margin-bottom:26px}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:26px 22px;margin-bottom:14px}
+.card .lab{font-size:13px;color:var(--muted);margin-bottom:7px}
+.card .val{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.35}
+.card .val em{font-style:normal;color:var(--rose)}
+.card .note{font-size:14.5px;color:var(--muted);margin-top:11px;word-break:keep-all}
+
+.combo{border-left:2px solid var(--rose);padding:2px 0 2px 20px;margin:30px 0}
+.combo h3{font-size:20px;margin-bottom:9px}
+.combo p{font-size:15.5px;color:#4A4F60;word-break:keep-all}
+
+.stage{margin:30px 0}
+.stage .lab{font-size:13px;color:var(--muted);margin-bottom:10px}
+.track{display:flex;gap:5px;margin-bottom:12px}
+.track span{flex:1;height:7px;background:var(--line);border-radius:1px}
+.track span.on{background:var(--rose)}
+.stage .name{font-family:var(--serif);font-size:19px;font-weight:700;margin-bottom:6px}
+.stage p{font-size:15.5px;color:#4A4F60;word-break:keep-all}
+
+.warn{background:var(--ink);color:#E8EAF0;border-radius:4px;padding:26px 22px;margin:30px 0}
+.warn .lab{font-size:13px;color:var(--muted-l);margin-bottom:10px}
+.warn .act{font-family:var(--serif);font-size:20px;color:#fff;line-height:1.5;margin-bottom:10px;word-break:keep-all}
+.warn p{font-size:15px;color:#A8AFC2;word-break:keep-all}
+
+.lock{border-top:1px solid var(--line);margin-top:38px;padding-top:34px}
+.lock h3{font-size:21px;margin-bottom:14px;word-break:keep-all}
+.lock p{font-size:15.5px;color:#4A4F60;margin-bottom:14px;word-break:keep-all}
+.lock .btn{margin-top:24px}
+.btag{text-align:center;font-size:13.5px;color:#5A5F70;margin-top:9px}
+.sep{display:flex;align-items:center;gap:12px;margin:34px 0 16px}
+.sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.sep span{font-size:12.5px;color:#9A968E;white-space:nowrap}
+.share{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn-sm{
+  background:#E9E7E3;border:0;color:#5A5F70;
+  padding:14px 8px;border-radius:3px;font-family:var(--sans);font-size:14.5px;
+  cursor:pointer;transition:background .18s,color .18s;
+}
+.btn-sm:hover,.btn-sm:focus-visible{background:#DFDCD6;color:var(--text)}
+.btn-sm.wide{width:100%;margin-top:9px}
+.shmsg{text-align:center;font-size:13.5px;color:var(--rose);margin-top:12px;min-height:20px}
+.lock .btn-line{color:var(--text);border-color:#B9B5AD;border-width:1.5px;font-weight:600;margin-top:22px}
+.lock .btn-line:hover{border-color:var(--ink);background:rgba(21,26,46,.03)}
+
+.disc{margin-top:40px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);word-break:keep-all}
+.disc p{margin-bottom:9px}
+.retry{background:none;border:0;color:var(--muted);font-size:14px;cursor:pointer;font-family:var(--sans);text-decoration:underline;margin-top:18px;padding:4px 0}
+
+@media(max-width:480px){
+  #intro h1{font-size:27px}
+  #qtext{font-size:20px}
+  .card .val{font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ========== 인트로 ========== -->
+<section id="intro">
+  <div class="shell">
+    <div class="mark">어나더 연애 구조 설계소</div>
+    <h1 class="kw">지금 두 사람이<br>어떤 구조에 있는지<br>30초 만에 확인합니다</h1>
+    <p class="sub kw">감정을 묻지 않습니다. 최근에 실제로 한 행동만 물어봅니다.</p>
+    <ul class="pre">
+      <li>나의 애착 유형</li>
+      <li>상대의 추정 애착 유형</li>
+      <li>두 사람의 조합이 만드는 구조</li>
+      <li>추격–회피 사이클에서 지금 서 있는 위치</li>
+      <li>이 구조에서 지금 가장 위험한 행동 한 가지</li>
+    </ul>
+    <button class="btn" id="start">진단 시작하기</button>
+    <p class="meta">10문항 · 약 30초 · 가입이나 개인정보 입력 없음</p>
+  </div>
+</section>
+
+<!-- ========== 문항 ========== -->
+<section id="quiz">
+  <div class="shell">
+    <div class="bar"><i id="prog"></i></div>
+    <div class="count">
+      <span id="cnum">1 / 10</span>
+      <span class="axis" id="caxis">나의 패턴</span>
+    </div>
+    <h2 id="qtext" class="kw"></h2>
+    <div class="opts" id="opts"></div>
+    <button class="back" id="back">← 이전 문항</button>
+  </div>
+</section>
+
+<!-- ========== 결과 ========== -->
+<section id="result">
+  <div class="shell">
+    <div class="rhead">진단 결과</div>
+
+    <div class="card">
+      <div class="lab">당신의 애착 유형</div>
+      <div class="val" id="rMe"></div>
+      <div class="note" id="rMeNote"></div>
+    </div>
+
+    <div class="card">
+      <div class="lab">상대의 추정 애착 유형</div>
+      <div class="val" id="rYou"></div>
+      <div class="note" id="rYouNote"></div>
+    </div>
+
+    <div class="combo">
+      <h3 id="rComboTitle"></h3>
+      <p id="rComboDesc" class="kw"></p>
+    </div>
+
+    <div class="stage" id="stageBox">
+      <div class="lab">추격–회피 사이클</div>
+      <div class="track" id="rTrack"></div>
+      <div class="name" id="rStageName"></div>
+      <p id="rStageDesc" class="kw"></p>
+    </div>
+
+    <div class="warn">
+      <div class="lab">지금 가장 위험한 행동</div>
+      <div class="act" id="rWarn"></div>
+      <p id="rWarnWhy"></p>
+    </div>
+
+    <div class="lock">
+      <h3 class="kw" id="ctaTitle"></h3>
+      <p class="kw" id="ctaMe"></p>
+      <p class="kw" id="ctaStage"></p>
+      <p class="kw">당신의 조합에 맞는 전체 진단과 단계별 행동 순서는 1:1로 정리해 드립니다.</p>
+      <a class="btn" href="KAKAO_LINK">익명 1:1 상담으로 전체 진단 받기</a>
+      <p class="btag">🔒 이름도 기록도 남지 않습니다</p>
+      <a class="btn-line" href="DETAIL_LINK">상담 종류와 금액 먼저 보기</a>
+
+      <div class="sep"><span>결과 저장 · 공유</span></div>
+      <div class="share">
+        <button class="btn-sm" id="shareImg">내 유형 스토리용</button>
+        <button class="btn-sm" id="saveImg">전체 결과 저장</button>
+      </div>
+      <button class="btn-sm wide" id="shareLink">진단 링크 공유하기</button>
+      <p class="shmsg" id="shmsg"></p>
+      <button class="retry" id="retry">진단 다시 하기</button>
+    </div>
+
+    <div class="disc">
+      <p>상대의 유형은 당신이 관찰한 행동을 기준으로 한 추정입니다. 실제 대화 기록을 함께 보면 결과가 달라지는 경우가 있습니다.</p>
+      <p>이 진단은 관계 구조를 파악하기 위한 참고 도구이며, 심리 상담이나 의학적 진단을 대체하지 않습니다. 일상생활이 어려울 정도의 불안이나 우울이 지속된다면 전문 기관의 도움을 받으시길 권합니다.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+// ─────────── 문항 ───────────
+// a:내불안 v:내회피 s:내안정 / pa:상대불안 pv:상대회피 ps:상대안정 / f:공포회피지표
+const Q = [
+{ax:"나의 패턴", q:"상대의 답장이 평소보다 늦어졌습니다. 당신이 실제로 한 행동은?", o:[
+  ["무슨 일 있냐고 물어봤다",{a:2}],
+  ["안 물어봤지만 하루 종일 폰을 확인했다",{a:2,v:1}],
+  ["나도 답장 텀을 늘렸다",{v:2}],
+  ["별생각 없이 내 일을 했다",{s:2}]]},
+
+{ax:"나의 패턴", q:"상대가 \"요즘 바빠서 정신이 없어\"라고 했을 때 드는 생각은?", o:[
+  ["나한테 마음이 식은 건가",{a:2}],
+  ["바쁘다는 건 핑계일 때가 많던데",{a:1,v:1}],
+  ["그럼 나도 연락을 줄여야겠다",{v:2}],
+  ["바쁜가 보네, 끝나면 연락 오겠지",{s:2}]]},
+
+{ax:"나의 패턴", q:"관계에서 갈등이 생겼을 때 당신은?", o:[
+  ["지금 당장 풀어야 잠이 온다",{a:2}],
+  ["일단 사과하고 넘어간다. 관계가 깨지는 게 더 무섭다",{a:2}],
+  ["말하지 않고 며칠 거리를 둔다",{v:2}],
+  ["감정이 가라앉은 뒤에 얘기하자고 한다",{s:2}]]},
+
+{ax:"나의 패턴", q:"상대가 당신에게 아주 많이 잘해주는 시기가 오면?", o:[
+  ["안심된다. 이 상태가 유지됐으면 좋겠다",{a:1}],
+  ["언제 식을까 불안하다",{a:2}],
+  ["이상하게 부담스럽고 답답해진다",{v:2}],
+  ["편하게 받아들인다",{s:2}]]},
+
+{ax:"나의 패턴", q:"최근 한 달, 혼자 있을 때 실제로 한 행동에 가장 가까운 것은?", o:[
+  ["상대의 SNS나 프로필을 확인했다",{a:2}],
+  ["보낼까 말까 하다 지운 메시지가 있다",{a:2}],
+  ["연락할 수 있었지만 일부러 하지 않았다",{v:2}],
+  ["딱히 없다",{s:2}]]},
+
+{ax:"상대의 패턴", q:"상대는 감정 이야기가 나오면 어떻게 하나요?", o:[
+  ["자기 감정을 비교적 잘 말한다",{ps:2}],
+  ["화제를 돌리거나 농담으로 넘긴다",{pv:2}],
+  ["나중에 얘기하자며 미룬다",{pv:2}],
+  ["오히려 나보다 더 예민하게 반응한다",{pa:2}]]},
+
+{ax:"상대의 패턴", q:"관계가 가까워지는 시점에 상대의 반응은?", o:[
+  ["더 적극적으로 다가온다",{ps:2}],
+  ["갑자기 연락이 뜸해지거나 거리를 둔다",{pv:2}],
+  ["잘해주다가 갑자기 차가워지기를 반복한다",{pv:2,f:1}],
+  ["확인이나 확답을 자주 요구한다",{pa:2}]]},
+
+{ax:"상대의 패턴", q:"상대가 힘든 일이 있을 때는?", o:[
+  ["나에게 털어놓는다",{ps:2}],
+  ["혼자 해결하려 하고 연락이 끊긴다",{pv:2}],
+  ["힘들다고 하면서도 도움은 거부한다",{pv:2,f:1}],
+  ["나에게 과하게 의존한다",{pa:2}]]},
+
+{ax:"상대의 패턴", q:"관계를 정리하자는 얘기가 나온 적이 있다면, 누가 먼저였나요?", o:[
+  ["상대가 먼저, 여러 번 있었다",{pv:3}],
+  ["상대가 꺼냈다가 번복한 적이 있다",{pv:2,f:1}],
+  ["내가 먼저 꺼냈다",{v:2}],
+  ["그런 얘기가 나온 적 없다",{}]]},
+
+{ax:"현재 위치", q:"지금 두 사람의 상태에 가장 가까운 것은?", o:[
+  ["서로 탐색 중이고, 아직 한쪽으로 기울지 않았다",{stage:0}],
+  ["한쪽이 더 애쓰고 있는 게 느껴진다",{stage:1}],
+  ["애쓰던 쪽이 지쳐서 연락을 줄이기 시작했다",{stage:2}],
+  ["이별했거나 사실상 정리된 상태다",{stage:3}]]}
+];
+
+// ─────────── 유형 설명 ───────────
+const NOTE = {
+"불안형":"관계가 흔들릴 때 확인과 접촉으로 안정을 되찾으려는 패턴입니다. 성격이 아니라 반응 방식입니다.",
+"거부회피형":"가까워질수록 부담을 느끼고 거리를 만들어 안정을 되찾는 패턴입니다.",
+"공포회피형":"가까워지고 싶은 마음과 두려움이 동시에 작동합니다. 다가감과 물러남이 반복됩니다.",
+"안정형":"관계가 흔들려도 과하게 매달리거나 차단하지 않고 조절할 수 있는 상태입니다.",
+"회피형(세부 판단 보류)":"회피 성향은 뚜렷하지만, 공포회피형인지 거부회피형인지는 이 문항만으로 확정되지 않습니다. 이 구분에 따라 대응이 정반대가 됩니다."
+};
+
+// ─────────── 조합 20개 ───────────
+const C = {
+"불안형|불안형":["둘 다 확인을 원하는 구조","갈등이 빠르게 커지고 빠르게 봉합됩니다. 문제는 봉합될 뿐 원인이 남아 다음 갈등의 크기를 키운다는 점입니다.","감정이 올라온 상태에서 바로 대화를 요구하는 것"],
+"불안형|거부회피형":["가장 흔하고 가장 고통스러운 조합","당신이 다가갈수록 상대는 물러납니다. 노력을 늘릴수록 상황이 나빠지는, 직관과 정반대로 작동하는 구조입니다.","장문 메시지를 보내거나 관계를 정의해달라고 요구하는 것"],
+"불안형|공포회피형":["밀당이 아니라 공포입니다","상대는 당신을 시험하는 게 아니라 가까워지는 것 자체를 두려워합니다. 다가왔다 도망가기를 반복합니다.","상대가 물러난 직후에 마음을 확인하려는 것"],
+"불안형|회피형(세부 판단 보류)":["추격–회피가 이미 작동 중입니다","상대의 회피 성향은 분명합니다. 다만 그 회피가 두려움에서 온 것인지 부담에서 온 것인지에 따라 대응이 정반대입니다.","연락 빈도를 늘려서 반응을 끌어내려는 것"],
+"불안형|안정형":["구조 자체는 나쁘지 않습니다","상대의 안정성이 관계를 지탱하고 있습니다. 당신의 불안 반응이 줄어들 여지가 가장 큰 구조이기도 합니다. 다만 확인 요구가 반복되면 안정형도 지칩니다.","같은 질문을 반복해서 확인받으려는 것"],
+
+"거부회피형|불안형":["주도권이 당신에게 있는 구조","당신이 물러날수록 상대는 더 매달립니다. 편해 보이지만 상대가 지치는 속도는 겉으로 드러나지 않습니다.","답장을 미루거나 연락을 끊어서 상황을 정리하려는 것"],
+"거부회피형|거부회피형":["관계가 조용히 소멸하는 구조","둘 다 먼저 다가가지 않습니다. 큰 갈등 없이 자연스럽게 멀어지고, 멀어진 뒤에야 아까워집니다.","먼저 연락하지 않는 것을 서로에 대한 배려라고 해석하는 것"],
+"거부회피형|공포회피형":["서로 다른 이유로 물러나는 구조","상대는 두려워서, 당신은 부담스러워서 물러납니다. 상대가 다가올 때만 반응하면 상대의 두려움이 확인됩니다.","상대가 어렵게 다가왔을 때 거리를 두는 것"],
+"거부회피형|회피형(세부 판단 보류)":["둘 다 물러서는 구조","먼저 움직이는 쪽이 없어 관계가 정체됩니다. 상대의 회피가 어디서 왔는지에 따라 접근 방식이 완전히 달라집니다.","상대가 먼저 움직이는지 확인하려고 시간을 끄는 것"],
+"거부회피형|안정형":["상대가 버텨주고 있는 구조","상대의 일관성 덕분에 관계가 유지되고 있습니다. 다만 감정 대화를 계속 피하면 상대도 결론을 내립니다.","감정에 대한 대화를 미루거나 넘기는 것"],
+
+"공포회피형|불안형":["당신의 진폭이 상대의 불안을 키우는 구조","당신이 다가갔다 물러날 때마다 상대의 불안이 증폭됩니다. 상대의 집착은 당신의 진폭에 대한 반응입니다.","잘해준 직후에 급격히 거리를 두는 것"],
+"공포회피형|거부회피형":["결정적 순간마다 둘 다 물러나는 구조","다가갈 기회가 와도 두 사람 모두 마지막에 멈춥니다. 관계가 진전 없이 같은 자리를 맴돕니다.","확인하려다 그만두기를 반복하는 것"],
+"공포회피형|공포회피형":["가장 불안정한 조합","둘 다 다가감과 도망을 반복합니다. 좋을 때는 매우 좋고, 나쁠 때는 관계 자체가 흔들립니다.","관계가 가장 좋을 때 먼저 거리를 두는 것"],
+"공포회피형|회피형(세부 판단 보류)":["둘 다 거리를 두지만 이유가 다릅니다","상대의 회피 유형을 특정하지 못하면 당신의 진폭이 상대에게 어떻게 읽히는지도 알 수 없습니다.","상대의 마음을 확인하려고 시험하는 행동"],
+"공포회피형|안정형":["상대의 안정성이 기회인 구조","상대가 흔들리지 않기 때문에 당신의 진폭이 줄어들 여지가 있습니다. 구조를 바꾸기 가장 유리한 조건입니다.","상대가 일관된지 확인하려고 일부러 시험하는 것"],
+
+"안정형|불안형":["당신이 안정을 공급하는 구조","상대의 불안은 당신의 반응으로 조절됩니다. 다만 논리로 설득하려 하면 불안은 오히려 커집니다.","상대의 불안을 논리로 반박하는 것"],
+"안정형|거부회피형":["속도 조절이 전부인 구조","구조 자체는 위험하지 않습니다. 상대가 감당할 수 있는 속도를 넘어서는 순간에만 회피가 발동합니다.","관계의 진도를 재촉하는 것"],
+"안정형|공포회피형":["상대의 진폭에 흔들리지 않는 것이 관건","상대가 다가왔다 물러날 때 당신까지 반응이 바뀌면 상대의 두려움이 사실로 확인됩니다.","상대의 변덕에 맞춰 내 반응의 온도를 바꾸는 것"],
+"안정형|회피형(세부 판단 보류)":["개입 여지가 남아 있는 구조","당신이 안정적이기 때문에 상대의 회피 유형만 특정되면 대응 설계가 가능합니다.","거리를 좁히려는 직접적인 시도"],
+"안정형|안정형":["애착 구조로는 설명되지 않는 구조","두 분 모두 관계에서 크게 흔들리지 않는 편입니다. 그런데도 지금 이 진단을 받고 계시다면, 문제는 애착이 아니라 다른 축에 있습니다. 가치관, 관계 속도, 외부 조건, 혹은 한쪽의 마음이 실제로 식었을 가능성입니다.","문제가 없다고 판단하고 그대로 두는 것"]
+};
+
+// ─────────── 단계 ───────────
+const S = [
+{n:"사이클 미형성", on:0, d:"아직 추격과 회피가 굳지 않았습니다. 구조를 바꾸기 가장 쉬운 시점이고, 동시에 이 시기의 행동이 앞으로의 구조를 결정합니다.", pre:"지금 하면 구조가 그대로 굳어집니다."},
+{n:"1단계 · 비대칭 발생", on:1, d:"한쪽이 더 애쓰기 시작했습니다. 이 시점의 노력은 대부분 역효과를 냅니다. 균형이 기울수록 회복 비용이 올라갑니다.", pre:"지금 하면 상대가 한 걸음 더 물러납니다."},
+{n:"2단계 · 역전 임박", on:2, d:"애쓰던 쪽이 지치기 시작했습니다. 곧 위치가 뒤바뀌거나 관계가 끝납니다. 사이클에서 가장 짧고 가장 결정적인 구간입니다.", pre:"지금 하면 회복이 어려워집니다."},
+{n:"사이클 종료 · 재구조화 국면", on:3, d:"사이클은 끝났습니다. 지금은 다른 문제입니다. 재회 가능성은 애착 유형이 아니라 이별의 방식과 경과 시간, 마지막 접촉 상태로 판단합니다.", pre:"지금 하면 재접촉 자체가 막힙니다."}
+];
+
+// ─────────── 카톡 유도 문구 ───────────
+const CTA_ME = {
+"불안형":"지금 당신이 하는 행동은 대부분 관계를 지키기 위한 것입니다. 문제는 그 행동이 이 구조에서는 반대로 작동한다는 점입니다. 노력의 방향을 바꾸는 데는 순서가 있고, 순서를 틀리면 지금보다 나빠집니다.",
+"거부회피형":"지금 상황이 크게 불편하지 않을 수 있습니다. 그게 이 구조의 특징입니다. 불편함을 느끼는 시점에는 이미 되돌리기 어려운 경우가 많습니다.",
+"공포회피형":"다가가고 싶은 마음과 도망치고 싶은 마음이 동시에 있습니다. 이건 변덕이 아니라 하나의 패턴이고, 패턴이라서 예측하고 조절할 수 있습니다.",
+"안정형":"당신 쪽 구조에는 큰 문제가 없습니다. 그래서 오히려 원인을 찾기 어렵습니다. 이런 경우 문제는 상대의 구조나 관계의 속도에 있습니다."
+};
+const CTA_STAGE = [
+"아직 구조가 굳지 않았습니다. 지금 개입하면 가장 적은 노력으로 바뀝니다.",
+"비대칭이 막 시작됐습니다. 이 시기의 대응이 앞으로 몇 달을 결정합니다.",
+"사이클에서 가장 짧은 구간입니다. 판단이 늦어질수록 선택지가 줄어듭니다.",
+"재회 판단은 애착 유형이 아니라 다른 기준으로 봅니다. 이별 방식, 경과 시간, 마지막 접촉 상태입니다. 가능한지 아닌지부터 정확하게 말씀드립니다."
+];
+const CTA_TITLE = {
+"불안형":"방향을 바꾸는 데는 순서가 있습니다",
+"거부회피형":"지금은 불편하지 않다는 게 신호입니다",
+"공포회피형":"변덕이 아니라 예측 가능한 패턴입니다",
+"안정형":"원인은 다른 축에 있습니다"
+};
+
+// ─────────── 진행 ───────────
+let i=0, hist=[], sc={a:0,v:0,s:0,pa:0,pv:0,ps:0,f:0}, stage=1;
+
+const $=id=>document.getElementById(id);
+
+function render(){
+  const q=Q[i];
+  $("cnum").textContent=(i+1)+" / "+Q.length;
+  $("caxis").textContent=q.ax;
+  $("prog").style.width=((i)/Q.length*100)+"%";
+  $("qtext").textContent=q.q;
+  const box=$("opts"); box.innerHTML="";
+  q.o.forEach(([label,val])=>{
+    const b=document.createElement("button");
+    b.className="opt"; b.type="button"; b.textContent=label;
+    b.onclick=()=>pick(val);
+    box.appendChild(b);
+  });
+  $("back").style.display = i>0 ? "block" : "none";
+  window.scrollTo(0,0);
+}
+
+function pick(val){
+  hist.push(JSON.parse(JSON.stringify({sc:sc,stage:stage})));
+  if("stage" in val) stage=val.stage;
+  else for(const k in val) sc[k]+=val[k];
+  i++;
+  if(i<Q.length) render(); else show();
+}
+
+$("back").onclick=()=>{
+  if(!hist.length) return;
+  const p=hist.pop(); sc=p.sc; stage=p.stage; i--; render();
+};
+
+$("start").onclick=()=>{
+  $("intro").style.display="none";
+  $("quiz").style.display="block";
+  render();
+};
+
+$("retry").onclick=()=>{
+  i=0; hist=[]; sc={a:0,v:0,s:0,pa:0,pv:0,ps:0,f:0}; stage=1;
+  $("result").style.display="none";
+  $("intro").style.display="block";
+  window.scrollTo(0,0);
+};
+
+// ─────────── 판정 ───────────
+function myType(){
+  const {a,v,s}=sc;
+  if(a>=4 && v>=4 && Math.abs(a-v)<=2) return "공포회피형";
+  if(s>=a && s>=v) return "안정형";
+  return a>=v ? "불안형" : "거부회피형";
+}
+function yourType(){
+  const {pa,pv,ps,f}=sc;
+  if(f>=2) return "공포회피형";
+  if(pv>=pa && pv>=ps && pv>0) return f===1 ? "회피형(세부 판단 보류)" : "거부회피형";
+  if(ps>=pa && ps>0) return "안정형";
+  if(pa>0) return "불안형";
+  return "회피형(세부 판단 보류)";
+}
+
+function show(){
+  const me=myType(), you=yourType();
+  const key=me+"|"+you;
+  const c=C[key] || C[me+"|회피형(세부 판단 보류)"];
+  const st=S[stage];
+
+  $("rMe").innerHTML="<em>"+me+"</em>";
+  $("rMeNote").textContent=NOTE[me];
+  $("rYou").innerHTML="<em>"+you+"</em>";
+  $("rYouNote").textContent=NOTE[you];
+
+  $("rComboTitle").textContent=me+" × "+you.replace("(세부 판단 보류)","")+" — "+c[0];
+  $("rComboDesc").textContent=c[1];
+
+  const tr=$("rTrack"); tr.innerHTML="";
+  for(let k=0;k<4;k++){
+    const s=document.createElement("span");
+    if(k<=st.on) s.className="on";
+    tr.appendChild(s);
+  }
+  $("rStageName").textContent=st.n;
+  $("rStageDesc").textContent=st.d;
+
+  $("rWarn").textContent=c[2];
+  $("rWarnWhy").textContent=st.pre;
+
+  $("ctaTitle").textContent=CTA_TITLE[me];
+  $("ctaMe").textContent=CTA_ME[me];
+  $("ctaStage").textContent=CTA_STAGE[stage];
+
+  LAST={me:me, you:you, stage:stage, combo:c[0]};
+
+  $("quiz").style.display="none";
+  $("result").style.display="block";
+  window.scrollTo(0,0);
+}
+
+// ─────────── 공유 ───────────
+let LAST = {me:"",you:"",stage:1,combo:""};
+
+function say(t){ const m=$("shmsg"); m.textContent=t; clearTimeout(say._t); say._t=setTimeout(()=>m.textContent="",3000); }
+
+// 캔버스 공통
+function baseCanvas(W,H){
+  const cv=document.createElement("canvas");
+  cv.width=W; cv.height=H;
+  const x=cv.getContext("2d");
+  x.fillStyle="#151A2E"; x.fillRect(0,0,W,H);
+  x.strokeStyle="rgba(255,255,255,.045)"; x.lineWidth=1;
+  for(let i=0;i<=W;i+=72){ x.beginPath(); x.moveTo(i,0); x.lineTo(i,H); x.stroke(); }
+  for(let i=0;i<=H;i+=72){ x.beginPath(); x.moveTo(0,i); x.lineTo(W,i); x.stroke(); }
+  x.textAlign="center";
+  return {cv,x,W,H};
+}
+function wrap(x,text,W,y,max,lh){
+  const words=text.split(" "); let line="";
+  words.forEach(w=>{
+    if(x.measureText(line+w).width>max){ x.fillText(line.trim(),W/2,y); line=w+" "; y+=lh; }
+    else line+=w+" ";
+  });
+  x.fillText(line.trim(),W/2,y);
+  return y;
+}
+function download(cv,name){
+  const a=document.createElement("a");
+  a.download=name; a.href=cv.toDataURL("image/png"); a.click();
+}
+
+// A-1. 공유용 — 내 유형만 (스토리 9:16)
+// 안전영역 260~1660 / 콘텐츠 세로 중심 960 정렬
+$("shareImg").onclick=()=>{
+  try{
+    const {cv,x,W,H}=baseCanvas(1080,1920);
+    const me=LAST.me.replace("(세부 판단 보류)","");
+
+    x.fillStyle="#8990A8"; x.font="500 38px Pretendard, sans-serif";
+    x.fillText("나의 애착 유형", W/2, 560);
+
+    x.fillStyle="#FFFFFF"; x.font="700 148px 'Gowun Batang', serif";
+    x.fillText(me, W/2, 780);
+
+    x.strokeStyle="#333B5C"; x.lineWidth=1;
+    x.beginPath(); x.moveTo(300,880); x.lineTo(780,880); x.stroke();
+
+    x.fillStyle="#C2C8D8"; x.font="500 42px Pretendard, sans-serif";
+    wrap(x, (NOTE[LAST.me].split(".")[0]+"."), W, 980, 720, 66);
+
+    x.fillStyle="#A83E56"; x.font="700 48px 'Gowun Batang', serif";
+    x.fillText("나는 어떤 유형일까?", W/2, 1230);
+
+    x.strokeStyle="#333B5C";
+    x.beginPath(); x.moveTo(390,1300); x.lineTo(690,1300); x.stroke();
+
+    x.fillStyle="#FFFFFF"; x.font="700 42px 'Gowun Batang', serif";
+    x.fillText("어나더 연애 구조 설계소", W/2, 1375);
+    x.fillStyle="#6E7793"; x.font="500 34px Pretendard, sans-serif";
+    x.fillText("@a.nother_l3", W/2, 1430);
+
+    download(cv,"어나더_나의애착유형_스토리.png");
+    say("스토리용 이미지가 저장되었습니다");
+  }catch(e){ say("저장에 실패했습니다. 화면을 캡처해 주세요"); }
+};
+
+// A-2. 보관용 — 전체 결과
+$("saveImg").onclick=()=>{
+  try{
+    const {cv,x,W}=baseCanvas(1080,1080);
+    x.fillStyle="#8990A8"; x.font="500 30px Pretendard, sans-serif";
+    x.fillText("관계 구조 진단 결과", W/2, 168);
+
+    x.fillStyle="#FFFFFF"; x.font="700 84px 'Gowun Batang', serif";
+    x.fillText(LAST.me.replace("(세부 판단 보류)",""), W/2, 320);
+    x.fillStyle="#A83E56"; x.font="400 44px 'Gowun Batang', serif";
+    x.fillText("×", W/2, 396);
+    x.fillStyle="#FFFFFF"; x.font="700 84px 'Gowun Batang', serif";
+    x.fillText(LAST.you.replace("(세부 판단 보류)",""), W/2, 486);
+
+    x.strokeStyle="#333B5C"; x.lineWidth=1;
+    x.beginPath(); x.moveTo(240,556); x.lineTo(840,556); x.stroke();
+
+    x.fillStyle="#C2C8D8"; x.font="500 34px Pretendard, sans-serif";
+    const endY = wrap(x, LAST.combo, W, 624, 700, 50);
+
+    const bw=120, gap=14, total=bw*4+gap*3, sx=(W-total)/2, by=endY+72;
+    for(let k=0;k<4;k++){
+      x.fillStyle = k<=S[LAST.stage].on ? "#A83E56" : "#333B5C";
+      x.fillRect(sx+k*(bw+gap), by, bw, 14);
+    }
+    x.fillStyle="#8990A8"; x.font="500 30px Pretendard, sans-serif";
+    x.fillText(S[LAST.stage].n, W/2, by+70);
+
+    x.fillStyle="#FFFFFF"; x.font="700 38px 'Gowun Batang', serif";
+    x.fillText("어나더 연애 구조 설계소", W/2, W-140);
+    x.fillStyle="#6E7793"; x.font="500 30px Pretendard, sans-serif";
+    x.fillText("@a.nother_l3", W/2, W-92);
+
+    download(cv,"어나더_관계구조진단.png");
+    say("전체 결과가 저장되었습니다");
+  }catch(e){ say("저장에 실패했습니다. 화면을 캡처해 주세요"); }
+};
+
+// B. 링크 공유
+$("shareLink").onclick=async()=>{
+  const url=location.origin+location.pathname;
+  const data={ title:"30초 관계 구조 진단", text:"두 사람이 어떤 구조에 있는지 30초로 확인해보세요", url:url };
+  try{
+    if(navigator.share){ await navigator.share(data); }
+    else{ await navigator.clipboard.writeText(url); say("링크가 복사되었습니다"); }
+  }catch(e){
+    try{ await navigator.clipboard.writeText(url); say("링크가 복사되었습니다"); }
+    catch(_){ say("주소창의 링크를 복사해 주세요"); }
+  }
+};
+</script>
+</body>
+</html>
